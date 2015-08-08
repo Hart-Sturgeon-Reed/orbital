@@ -1,6 +1,8 @@
 if Meteor.isClient
   console.log 'Server started successfully'
   
+  window.screen.orientation?.lock?('landscape-primary')
+  
   Session.setDefault 'clicks', 0
   
   Template.main.helpers
@@ -12,17 +14,26 @@ if Meteor.isClient
       
   
   window.setupStage = ->
-    stageWidth = window.screen.availWidth
-    stageHeight = window.screen.availHeight
+    window.stageWidth = window.innerWidth
+    window.stageHeight = window.innerHeight
+    window.worldWidth = stageWidth/2
+    window.worldHeight = stageHeight/2
     cen =
-      x: stageWidth / 2
-      y: stageHeight / 2
+      x: worldWidth / 2
+      y: worldHeight / 2
     
     console.log "New canvas #{stageWidth} wide and #{stageHeight} tall"
     
-    renderer = PIXI.autoDetectRenderer(stageWidth, stageHeight, {backgroundColor : 0x000})
-    document.body.appendChild(renderer.view)
-    stage = window.stage = new PIXI.Container()
+    renderer = Physics.renderer('pixi', {
+        el: 'game-canvas'
+        meta: false
+    })
+
+    renderer.resize(stageWidth,stageHeight);
+    
+    #document.body.appendChild(renderer.view)
+    
+    stage = window.stage = renderer.stage
     
     PIXI.loader
       .add('wisp', 'sprites/spheres/wispLt.png')
@@ -37,21 +48,20 @@ if Meteor.isClient
     
     stage.ready = ->
       console.log 'building scene'
-      rad = window.getRadialSym
-      for cen in rad(6, {x: cen.x - 430, y: cen.y}, {x: cen.x , y: cen.y}, Math.PI/2)
-        for pos in rad(6, {x: cen.x + 220, y: cen.y}, {x: cen.x, y: cen.y})
-          sphere = new PIXI.Sprite(stage.tex.bubble)
-          sphere.tint =  0xFF0A0D
-          sphere.alpha = 0.4
-          sphere.scale.x -= 0.1
-          sphere.scale.y -= 0.1
-          sphere.anchor.x = sphere.anchor.y = 0.5
-          sphere.position.x = pos.x
-          sphere.position.y = pos.y
+      rad = getRadialSym
+      for cen in rad(6, {x: cen.x + 110, y: cen.y}, {x: cen.x , y: cen.y}, Math.PI/2)
+        for pos in rad(6, {x: cen.x + 80, y: cen.y}, {x: cen.x, y: cen.y})
+          sphere = new Particle({
+            #tex: stage.tex.bubble 
+            pos: pos
+            scale: {x: 0.6, y: 0.6}
+            alpha: 0.2
+          })
 
-          stage.addChild sphere
+          stage.addChild sphere.sprite
       
-      stage.animate()
+      #stage.animate()
+      setupWorld renderer
     
     stage.animate = ->
       renderer.render stage

@@ -1,5 +1,6 @@
-if Meteor.isClient
-  window.getRadialSym = (sym, root, origin, rotation) ->
+globe = exports ? this
+unless globe.getRadialSym? 
+  globe.getRadialSym = (sym, root, origin, rotation) ->
     points = []
     if(sym==0) 
       return points
