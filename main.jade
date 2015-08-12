@@ -1,9 +1,13 @@
 head
-  title Soma
+  title Orbital
+  meta(name="mobile-web-app-capable" content="yes")
+  link(rel="icon" sizes="192x192" href="sprites/logo.png")
+  meta(name="viewport" content="width=device-width, initial-scale=1, user-scalable=no")
 
 template(name='layout')
   body
     +yield 'content'
+    +yield 'ui'
 
 template(name='main')
   div#game-canvas

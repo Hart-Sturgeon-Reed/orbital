@@ -3,11 +3,8 @@ setupWorld = function(renderer){
     world = Physics({
         timestep: 1000.0 / 140
     });
-
     // add the renderer
     world.add( renderer );
-  
-    dev = 'default';
     
     console.log('Device is: '+dev);
   
@@ -15,11 +12,11 @@ setupWorld = function(renderer){
       worldWidth = stageWidth/2;
       worldHeight = stageHeight/2;
     }else if (dev=='mobile'){
-      worldWidth = stageWidth/3;
+      worldWidth = stageWidth/6;
       worldHeight = stageHeight/3;
-      scaleFactor *= (2/3);
-      courseLength *= (1.1);
-      gravityStrength = GRV.mobile;
+//      scaleFactor *= (2/3);
+//      courseLength *= (1.1);
+//      gravityStrength = GRV.mobile;
     }else{
       worldWidth = stageWidth/2;
       worldHeight = stageHeight/2;
