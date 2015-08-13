@@ -1,0 +1,14 @@
+window.colors =
+  white: '0xFFFFFF',
+  black: '0x000000',
+  red: '0xFE2506',
+  orange: '0xFE9208',
+  ltOrange: '0xFED59B',
+  yellow: '0xFFC102',
+  green: '0x009E2E',
+  teal: '0xC8FDFE',
+  blue: '0x268ECB',
+  deepBlue: '0x114FFF',
+  dkBlue: '0x14546f',
+  indigo: '0x2F2F66',
+  purple: '0x6B54A2'

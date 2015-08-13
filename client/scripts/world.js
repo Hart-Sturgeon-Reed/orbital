@@ -1,4 +1,5 @@
 setupWorld = function(renderer){
+  console.log('building world');
     // create a physics world
     world = Physics({
         timestep: 1000.0 / 140
@@ -12,20 +13,19 @@ setupWorld = function(renderer){
       worldWidth = stageWidth/2;
       worldHeight = stageHeight/2;
     }else if (dev=='mobile'){
-      worldWidth = stageWidth/6;
-      worldHeight = stageHeight/3;
-//      scaleFactor *= (2/3);
-//      courseLength *= (1.1);
-//      gravityStrength = GRV.mobile;
+      stage.root.scale = {
+        x: 0.333,
+        y: 0.333
+      }
     }else{
-      worldWidth = stageWidth/2;
-      worldHeight = stageHeight/2;
+      worldWidth = stageWidth;
+      worldHeight = stageHeight;
     }
     
-    var viewportBounds = Physics.aabb(0, 0, worldWidth, worldHeight);
+    var viewportBounds = Physics.aabb(0, 0, stageWidth, stageHeight);
     bounds = Physics.behavior('edge-collision-detection', {
         aabb: viewportBounds,
-        restitution: 0.1,
+        restitution: 0.9,
         cof: 0.3,
         label:'bounds'
     });
@@ -33,20 +33,36 @@ setupWorld = function(renderer){
     world.add( bounds );
   
     impulse = Physics.behavior('body-impulse-response');
-    collision = Physics.behavior('body-collision-detection')
     world.add( impulse );
+  
+    collision = Physics.behavior('body-collision-detection')
     world.add( collision );
+  
     world.add(Physics.behavior('sweep-prune') );
-    world.add(Physics.behavior('interactive', { el: renderer.el }));
+    
+    interactive = Physics.behavior('interactive', { 
+      el: renderer.el, 
+      minVel: {x: 0, y: 0},
+      maxVel: {x: 0, y: 0},
+      noDrag: true
+    })
+    world.add(interactive);
     
     gravity = Physics.behavior('constant-acceleration', {
         acc: { x : 0, y: 0.0014 } // 0.0016 is the default // 14 normal // 10 light // 18 heavy
     });
-    world.add(gravity);
+    //world.add(gravity);
+  
+    orbitalGrav = Physics.behavior('newtonian', {
+        strength: 0.16,
+        max: 880,
+        min: 90
+    });
+    world.add(orbitalGrav);
     
     attractor = Physics.behavior('attractor', {
 	    order: 0,
-	    strength: 0.001
+	    strength: 0.0001
 	});
     
     constraints = Physics.behavior('verlet-constraints', {
@@ -55,22 +71,25 @@ setupWorld = function(renderer){
     world.add(constraints);
     
 	world.on({
-//	    'interact:poke': function( pos ){
-//		attractor.position( pos );
-//		world.add( attractor );
-//	    }
-//	    ,'interact:move': function( pos ){
-//		attractor.position( pos );
-////            if(mouse!=null) mouse.setPos(pos);
-//	    }
-//	    ,'interact:release': function(){
-//		world.remove( attractor );
-//	    }
+      'interact:grab': function( data ){
+        input.startGrab(data);
+      }
+      ,'interact:poke': function( data ){
+        //attractor.position( pos );
+        //world.add( attractor );
+      }
+      ,'interact:move': function( data ){
+        //attractor.position( pos );
+//      if(mouse!=null) mouse.setPos(pos);
+        input.onMove(data);
+      }
+      ,'interact:release': function( data ){
+        input.endGrab(data);
+      }
 	});
 
     // render on each step
     world.on('step', function(){
-        //gameLoop();
         world.render();
     });
     
@@ -87,9 +106,13 @@ setupWorld = function(renderer){
     });
     
     Physics.util.ticker.on(function(time){
-        //if(paused) return;
+        if(game.is.paused) {world.render(); return;}
+        gameLoop(time);
         world.step(time);
     });
   
-    Physics.util.ticker.start();
+    world.warp(0.2); //set time to 1/10 speed
+    
+    setupInput();
+    startGame({x: worldWidth/2, y: worldHeight/2});
 }

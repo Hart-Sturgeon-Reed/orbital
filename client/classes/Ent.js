@@ -72,7 +72,7 @@ Ent = function(options){
             self.sprite.width = self.spriteScale * newScale;
             self.sprite.height = self.spriteScale * scaleY;
         }
-        self.body.geometry.radius = self.sprite.width;
+        self.body.geometry.radius = self.sprite.width / 2;
         self.body.geometry.width = self.sprite.width;
         self.body.geometry.height = self.sprite.height;
         self.body.recalc();

@@ -3,7 +3,7 @@ if Meteor.isClient
   
   window.screen.orientation?.lock?('landscape-primary')
   
-  if window.matchMedia('(max-device-width: 800px)').matches
+  if window.matchMedia('(max-device-width: 880px)').matches
     dev = 'mobile'
   else if window.matchMedia('(max-device-width: 960px)').matches
     dev = 'tablet'
