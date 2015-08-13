@@ -8371,7 +8371,8 @@ Physics.behavior('interactive', function( parent ){
         // must be in node environment
         return {};
     }
-
+    
+    //Hart custom bullshit - added noDrag option to disable body dragging effect
     var defaults = {
             // the element to monitor
             el: null,
@@ -8380,7 +8381,8 @@ Physics.behavior('interactive', function( parent ){
             // minimum velocity clamp
             minVel: { x: -5, y: -5 },
             // maximum velocity clamp
-            maxVel: { x: 5, y: 5 }
+            maxVel: { x: 5, y: 5 },
+            noDrag: false
         }
         ,getElementOffset = function( el ){
             var curleft = 0
@@ -8450,10 +8452,12 @@ Physics.behavior('interactive', function( parent ){
 
                         if ( body ){
                             // we're trying to grab a body
-
-                            // fix the body in place
-                            body.state.vel.zero();
-                            body.state.angular.vel = 0;
+                            //Hart custom bullshit - added noDrag option to disable body dragging effect
+                            if (!self.options.noDrag) {
+                              // fix the body in place
+                              body.state.vel.zero();
+                              body.state.angular.vel = 0;
+                            }
                             body.isGrabbed = true;
                             // remember the currently grabbed bodies
                             data = self.bodyData[touchId] || {};
@@ -8465,7 +8469,10 @@ Physics.behavior('interactive', function( parent ){
                             // if we're grabbing the same body twice we don't want to remember the wrong treatment.
                             data.treatment = self.bodyDataByUID[ body.uid ] ? self.bodyDataByUID[ body.uid ].treatment : body.treatment;
                             // change its treatment but remember its old treatment
-                            body.treatment = 'kinematic';
+                            //Hart custom bullshit - added noDrag option to disable body dragging effect
+                            if (!self.options.noDrag) {
+                              body.treatment = 'kinematic';
+                            }
                             // remember the click/touch offset
                             data.pos = data.pos || new Physics.vector();
                             data.pos.clone( pos );
@@ -8577,11 +8584,14 @@ Physics.behavior('interactive', function( parent ){
 
                             dt = Math.max(Physics.util.ticker.now() - data.time, self.options.moveThrottle);
                             body.treatment = data.treatment;
-                            // calculate the release velocity
-                            body.state.vel.clone( data.pos ).vsub( data.oldPos ).mult( 1 / dt );
-                            // make sure it's not too big
-                            body.state.vel.clamp( self.options.minVel, self.options.maxVel );
-
+                          
+                            //Hart custom bullshit
+                            if (!self.options.noDrag) {
+                              // calculate the release velocity
+                              body.state.vel.clone( data.pos ).vsub( data.oldPos ).mult( 1 / dt );
+                              // make sure it's not too big
+                              body.state.vel.clamp( self.options.minVel, self.options.maxVel );
+                            }
                             body.isGrabbed = false;
                             pos.body = body;
 
@@ -8663,6 +8673,9 @@ Physics.behavior('interactive', function( parent ){
 
             // if we have one or more bodies grabbed, we need to move them to the new mouse/finger positions.
             // we'll do this by adjusting the velocity so they get there at the next step
+          
+            //Hart custom bullshit - added noDrag option to disable body dragging effect
+            if (self.options.noDrag) { return }
             for ( var touchId in self.bodyData ) {
                 d = self.bodyData[touchId];
                 body = d.body;

@@ -13,3 +13,12 @@ unless globe.getRadialSym?
     for i in [1...sym]
         points.push root.rotate(shift, origin).clone()
     return points
+    
+globe.rnd = (opt) ->
+  return Math.random() unless opt?
+  if typeof opt is 'object'
+    return (Math.random() * opt.eql) - (opt.eql / 2) if opt.eql?
+    
+    return opt.min + Math.random() * (opt.max - opt.min) if opt.min? and opt.max?
+  else
+    return Math.random() * opt 
