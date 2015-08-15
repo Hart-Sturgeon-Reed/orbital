@@ -41,10 +41,10 @@ class Particle
           vector = targetPos.vsub(pos)
           dist = vector.clone().norm()
           if dist < @sprite.target.radius * 0.8 and @sprite.dead is false
-            stage.ents.removeChild @sprite
+            stage.flares.removeChild @sprite
             @sprite.dead = true
             @sprite.age = -1
-            @sprite.target.self.addEnergy @sprite.energy
+            @sprite.target.self.addEnergy @sprite.energy, true
           correctVel = vector.clone().normalize().mult(@sprite.speed)
           @sprite.vel.x += (correctVel.x - @sprite.vel.x)/10
           @sprite.vel.y += (correctVel.y - @sprite.vel.y)/10

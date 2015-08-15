@@ -20,5 +20,7 @@ if Meteor.isClient
     'click .inc': (event) ->
       console.log 'quak'
       Session.set 'clicks', (Session.get('clicks') + 1)
+  Template.main.rendered = ->
+    setupStage()
     
   

@@ -20,6 +20,14 @@ window.setupStage = ->
     
     stage = window.stage = renderer.stage
     
+    stage.audio = 
+      title: new buzz.sound('sounds/title', {formats: ['mp3', 'ogg']}).load()
+      active: new buzz.sound('sounds/active', {formats: ['mp3', 'ogg']}).load()
+      passive: new buzz.sound('sounds/passive', {formats: ['mp3', 'ogg']}).load()
+      launch: new buzz.sound('sounds/launch', {formats: ['mp3', 'ogg']}).setVolume(50).load()
+      destroy: new buzz.sound('sounds/destroy', {formats: ['mp3', 'ogg']}).load()
+      collide: new buzz.sound('sounds/collide', {formats: ['mp3', 'ogg']}).setVolume(60).load()
+    
     PIXI.loader
       .add('wisp', 'sprites/spheres/wispLt.png')
       .add('bubble', 'sprites/spheres/bubbleLt.png')
@@ -40,7 +48,9 @@ window.setupStage = ->
       stage.root.scale.y -= 0.5
       stage.addChild stage.root
       
+      addLayer 'flares'
       addLayer 'ents'
+      addLayer 'suns'
       addLayer 'ui'
       
       setupWorld renderer

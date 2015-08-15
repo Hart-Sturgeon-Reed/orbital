@@ -55,8 +55,8 @@ setupWorld = function(renderer){
   
     orbitalGrav = Physics.behavior('newtonian', {
         strength: 0.16,
-        max: 880,
-        min: 90
+        max: worldWidth * 0.45,
+        min: worldHeight * 0.01
     });
     world.add(orbitalGrav);
     
@@ -102,7 +102,7 @@ setupWorld = function(renderer){
     });
   
     world.on('collisions:detected', function( data, e ){
-      //processCollisions(data,e);
+      Collisions.collide(data,e);
     });
     
     Physics.util.ticker.on(function(time){
@@ -111,7 +111,7 @@ setupWorld = function(renderer){
         world.step(time);
     });
   
-    world.warp(0.2); //set time to 1/10 speed
+    world.warp(0.7); //set time to 1/10 speed
     
     setupInput();
     startGame({x: worldWidth/2, y: worldHeight/2});

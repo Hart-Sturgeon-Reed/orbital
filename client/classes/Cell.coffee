@@ -14,22 +14,25 @@ class Cell
         restitution: 0.999
         pos: @opt.pos
         label: 'cell',
-        alpha: 0.42
+        alpha: 0.92
+        blendMode: PIXI.BLEND_MODES.SCREEN
         
     options[prop] = val for prop, val of @opt
         
     Ent.call(this, options)
     
     @body.self = this
+    @team = @opt.team
     #@body.follow = player
     #@body.parallax = 1
     
     @charges = []
     @halo = []
     @maxEnergy = 100
-    @shotForce = 0.0020
+    @shotForce = 0.0006
     @energy = @maxEnergy / 2 #rnd(@maxEnergy)
     @scale = 1
+    @maxScale = 2
     
     for pos in getRadialSym(6, {x: 0, y: 180}, {x: 0, y: 0})
       ring = new Particle({
@@ -57,7 +60,7 @@ class Cell
       @charges.push charge
       
     @highlight = ->
-      @sprite.alpha = 0.8
+      @sprite.alpha = 1
       
     @unhighlight = ->
       @sprite.alpha = options.alpha
@@ -80,11 +83,13 @@ class Cell
           charge.sprite.tint = colors.white
           charge.sprite.alpha = 0.3
           
-    @useEnergy = (amt) ->
+    @useEnergy = (amt, massToo = false) ->
       prevEnergy = @energy
       newAmt = @energy - amt
       @energy = if newAmt < 0 then 0 else newAmt
       @updateEnergy()
+      
+      return unless massToo
       
       change = prevEnergy - @energy
       
@@ -92,23 +97,51 @@ class Cell
       @setScale @scale
       @setMass options.mass * @scale
       
-    @addEnergy = (amt) ->
+    @hit = (amt) ->
+      @scale -= 0.06 * amt
+      if @scale < 0.15
+        @destroy()
+      @scale = if @scale < 0.1 then 0.1 else @scale
+      @setScale @scale
+      @setMass options.mass * @scale
+      
+    @destroy = ->
+      console.log 'destroyed'
+      game.cells.splice game.cells.indexOf(@body), 1
+      stage.ents.removeChild @sprite
+      world.remove @body
+      
+      stage.audio.destroy.setTime(0).play()
+      
+    @addEnergy = (amt, massToo = false) ->
       prevEnergy = @energy
       newAmt = @energy + amt
       @energy = if newAmt > @maxEnergy then @maxEnergy else newAmt
       @updateEnergy()
       
+      return unless massToo
+      
       change = @energy - prevEnergy
       
       @scale += (0.4 * (change / @maxEnergy))
+      @scale = if @scale > @maxScale then @maxScale else @scale
       @setScale @scale
       @setMass options.mass * @scale
       
     @executeShot = ->
       @useEnergy @body.nextShot.cost
       
-      @body.applyForce @body.nextShot.mult(@shotForce)
+      @body.applyForce @body.nextShot.mult(@shotForce * (@body.mass * 0.9))
       @body.nextShot = null
+      if game.firstShot
+        stage.audio.active.fadeTo 80, 200
+        stage.audio.passive.fadeTo 0, 200
+      else game.startMusic()
+      
+      stage.audio.launch.setTime(0).play()
+      
+    @update = ->
+      @body.state.vel.mult(0.99998)
     
     world.add @body
     stage.ents.addChild @sprite

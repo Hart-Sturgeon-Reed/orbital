@@ -5,6 +5,7 @@ Graphics = ->
   overlay: new PIXI.Graphics()
   show: -> 
     stage.ui.addChild @canvas
+    stage.marker.sprite.tint = colors[game.turn]
     stage.marker.sprite.visible = true
   hide: -> 
     stage.ui.removeChild @canvas

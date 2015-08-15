@@ -8,5 +8,4 @@ Router.route '/', { # Root
       }
     onAfterAction: ->
       console.log Iron.Location.get().path
-      window.setupStage()
   }
