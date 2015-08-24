@@ -5,18 +5,40 @@ window.setupInput = ->
 window.input =
   grabStarted: false
   
+  keyPressed: (data) ->
+    console.log data.which
+    switch data.keyCode
+      when 82
+        console.log 'r'#generate new mandalas
+        refreshMandalas()
+      when 83 #s
+        #set save mode
+        console.log 's'
+        game.is.saving = true
+      when 71
+        console.log 'g'
+        name = prompt 'Enter the name of the creature you would like to find:'
+        if name?
+          displayMandala getGenome name
+        else
+          console.log 'canceled search'
+      when 67
+        console.log 'c'
+      when 77
+        console.log 'm'
+  
   startGrab: (data) ->
     #attractor.position( data )
     #world.add( attractor )
     world.wakeUpAll()
     
-    return unless game.is.paused and data.body.self.sprite.tint == colors[game.turn]
+    return unless game.is.paused and data.body.self.sprite.tint == colors.white #colors[game.turn]
     
     @grabStarted = true
     
     data.body.self.highlight()
     
-    stage.marker.sprite.tint = colors.orange
+    stage.marker.sprite.tint = colors.white #colors[game.turn]
     stage.marker.sprite.position =
       x: data.x
       y: data.y
@@ -30,7 +52,7 @@ window.input =
     
     data.body?.self.unhighlight()
     
-    stage.marker.sprite.tint = colors[game.turn]
+    stage.marker.sprite.tint = colors.white #colors[game.turn]
     stage.marker.sprite.alpha = 0 if dev is 'mobile'
     
     if data.body.nextShot? and data.body.nextShot.clone().norm() > 10 and data.body.nextShot.valid?
@@ -51,7 +73,7 @@ window.input =
         
       cost = data.body.nextShot.clone().norm() / 2.6
       if cost < data.body.self.energy
-        stage.marker.sprite.tint = colors[game.turn]
+        stage.marker.sprite.tint = colors.white #colors[game.turn]
         data.body.nextShot.valid = true
         data.body.nextShot.cost = cost
       else 

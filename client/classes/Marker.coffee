@@ -7,7 +7,7 @@ class Marker
       scale:
         x: 0.1
         y: 0.1
-      tint: colors[game.turn]
+      tint: colors.white #colors[game.turn]
     }
   
 root.Marker = Marker unless root.Marker?

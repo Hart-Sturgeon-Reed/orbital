@@ -17,6 +17,7 @@ window.setupStage = ->
     })
 
     renderer.resize(stageWidth,stageHeight)
+    window.renderer = renderer
     
     stage = window.stage = renderer.stage
     
@@ -30,12 +31,22 @@ window.setupStage = ->
     
     PIXI.loader
       .add('wisp', 'sprites/spheres/wispLt.png')
+      .add('wispMd', 'sprites/spheres/wispMd.png')
+      .add('wispDk', 'sprites/spheres/wisp.png')
       .add('bubble', 'sprites/spheres/bubbleLt.png')
+      .add('bubbleDk', 'sprites/spheres/bubbleDk.png')
+      .add('cell', 'sprites/spheres/cell.png')
+      .add('planet', 'sprites/spheres/planet.png')
+      .add('sphereLt', 'sprites/spheres/sphereLt.png')
+      .add('sphereMd', 'sprites/spheres/sphereMd.png')
+      .add('sphereDk', 'sprites/spheres/sphereDk.png')
       .once('complete', (loader, resources) ->
         console.log 'assets loaded'
-        stage.tex =
-          wisp : resources.wisp.texture
-          bubble : resources.bubble.texture
+        stage.tex = {}
+        stage.allTex = []
+        for label, res of resources
+          stage.tex[label] = res.texture
+          stage.allTex.push res.texture
         stage.ready()
       )
     

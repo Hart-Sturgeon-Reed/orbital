@@ -5,6 +5,7 @@ class Particle
     life = if dev =='mobile' then worldWidth * 0.2 else worldWidth * 0.3
     @defaults =
       tex: stage.tex.wisp
+      sprite: null
       position: {x: 0, y: 0}
       vel: {x: 0, y: 0}
       scale: {x: 1, y: 1}
@@ -22,7 +23,14 @@ class Particle
     @opt.position = @opt.pos if @opt.pos?
     
     #create the pixijs sprite
-    @sprite = new PIXI.Sprite(@opt.tex)
+    switch @opt.sprite
+      when null
+        @sprite = new PIXI.Sprite(@opt.tex)
+      else
+        tex = new PIXI.RenderTexture(renderer.renderer, worldWidth, worldHeight)
+        tex.render(@opt.sprite)
+        @sprite = new PIXI.Sprite(tex)
+    
     #add options to sprite
     @sprite[prop] = val for prop, val of @opt
     @sprite.age = @sprite.lifetime
@@ -46,8 +54,8 @@ class Particle
             @sprite.age = -1
             @sprite.target.self.addEnergy @sprite.energy, true
           correctVel = vector.clone().normalize().mult(@sprite.speed)
-          @sprite.vel.x += (correctVel.x - @sprite.vel.x)/10
-          @sprite.vel.y += (correctVel.y - @sprite.vel.y)/10
+          @sprite.vel.x += (correctVel.x - @sprite.vel.x)/12
+          @sprite.vel.y += (correctVel.y - @sprite.vel.y)/12
           
   
 unless root.Particle

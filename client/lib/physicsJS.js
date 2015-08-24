@@ -8587,7 +8587,7 @@ Physics.behavior('interactive', function( parent ){
                           
                             //Hart custom bullshit
                             if (self.options.noDrag) {
-                              body.state.vel.zero();
+                              body.state.vel.mult(0.9);
                             }else{
                               // calculate the release velocity
                               body.state.vel.clone( data.pos ).vsub( data.oldPos ).mult( 1 / dt );

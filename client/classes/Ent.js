@@ -17,7 +17,7 @@ Ent = function(options){
     if (options.restitution==null) options.restitution = 0.9;
     if (options.friction==null) options.friction = 0.2;
     if (options.angle==null) options.angle = Math.random();
-    if (options.sprite==null) options.sprite = sprites.bubLt;
+    if (options.sprite==null) options.sprite = stage.tex.wisp;
     if (options.blendMode==null) options.blendMode = PIXI.BLEND_MODES.NORMAL;
     if (options.anchor==null) options.anchor = {x:0.5,y:0.5};
     if (options.tint==null) {

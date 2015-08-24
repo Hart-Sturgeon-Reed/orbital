@@ -2,9 +2,9 @@ root = exports ? this
 
 class Core
   constructor: (@opt) ->
-    size = if dev == 'mobile' then worldWidth / 36 else worldWidth * 0.016
+    size = if dev == 'mobile' then worldWidth / 36 else worldWidth * 0.018
     options =
-        mass: 2.2
+        mass: 6.2
         type: 'circle'
         sprite: stage.tex.bubble
         radius: size
@@ -22,6 +22,7 @@ class Core
     Ent.call(this, options)
     
     @body.self = this
+    @body.nextShot = null
     @team = @opt.team
     #@body.follow = player
     #@body.parallax = 1
@@ -29,7 +30,7 @@ class Core
     @charges = []
     @halo = []
     @maxEnergy = 100
-    @shotForce = 0.0006
+    @shotForce = 0.0001
     @energy = @maxEnergy / 2 #rnd(@maxEnergy)
     @scale = 1
     @maxScale = 2
@@ -37,16 +38,21 @@ class Core
     for pos in getRadialSym(3, {x: 0, y: 180}, {x: 0, y: 0})
       ring = new Particle({
         pos: pos
-        alpha: 0.64
+        alpha: 0.94
         tex: stage.tex.bubble
         blendMode: PIXI.BLEND_MODES.SCREEN
-        tint: colors.white
+        tint: @opt.tint
         scale:
-          x: 1.9
-          y: 1.9
+          x: 0.6
+          y: 0.6
       })
       @sprite.addChild ring.sprite
       @halo.push ring
+      ring.sprite.addChild new SpriteRing({
+        sym: 7
+        offset: 60
+        alpha: 0.45
+      }).sprite
     
     for pos in getRadialSym(10, {x: 60, y: 0}, {x: 0, y: 0})
       charge = new Particle({
@@ -119,7 +125,7 @@ class Core
       @energy = if newAmt > @maxEnergy then @maxEnergy else newAmt
       @updateEnergy()
       
-      return unless massToo
+      return #unless massToo
       
       change = @energy - prevEnergy
       
@@ -141,7 +147,8 @@ class Core
       stage.audio.launch.setTime(0).play()
       
     @update = ->
-      @body.state.vel.mult(0.99998)
+      @body.state.vel.mult(0.9988)
+      @body.state.angular.vel *= 0.99
     
     world.add @body
     stage.ents.addChild @sprite

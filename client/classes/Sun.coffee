@@ -3,7 +3,7 @@ root = exports ? this
 class Sun
   constructor: (@opt) ->
     size = if dev == 'mobile' then worldWidth * 0.05 else worldWidth * 0.04
-    absorption = if dev == 'mobile' then size * 6.5 else worldWidth * 0.2
+    range = if dev == 'mobile' then size * 6.5 else worldWidth * 0.3
     options =
         mass: 7
         type: 'circle'
@@ -19,7 +19,10 @@ class Sun
         tint: colors.white
         treatment: 'static'
         blendMode: PIXI.BLEND_MODES.SCREEN
-        range: absorption
+        range: range
+        attractor: false
+        
+    @opt[prop] ?= val for prop, val of options
         
     Ent.call(this, options)
     
@@ -31,16 +34,16 @@ class Sun
       for cell in game.cells
         dist = cell.state.pos.clone().vsub(@body.state.pos).norm()
         if dist < options.range and rnd() > 0.7 + (0.3 * (dist/options.range))
-          size = if dev == 'mobile' then rnd {min: 0.2, max: 1.48} else rnd {min: 0.47, max: 2.68}
+          size = if dev == 'mobile' then rnd {min: 0.2, max: 1.48} else rnd {min: 0.47, max: 1.68}
           pellet = new Particle({
             position: @body.state.pos.clone()
             tint: colors.ltOrange
             tex: stage.tex.wisp
             scale: {x: size, y: size}
             blendMode: PIXI.BLEND_MODES.SCREEN
-            alpha: 0.17
+            alpha: 0.12
             speed: 6.2
-            lifetime: worldWidth * 0.3
+            lifetime: worldWidth * 0.6
             vel:
               x: rnd {eql: 18}
               y: rnd {eql: 18}
@@ -59,7 +62,7 @@ class Sun
             scale: {x: size, y: size}
             blendMode: PIXI.BLEND_MODES.SCREEN
             alpha: 0.44
-            speed: 1.0
+            speed: 3.0
             lifetime: worldWidth * 0.4
             vel:
               x: rnd {eql: 1}
@@ -71,15 +74,16 @@ class Sun
           stage.flares.addChild pellet.sprite
           game.particles.push pellet
     
-    @attractor = Physics.behavior('attractor', {
-      order: 1.5
-      strength: 0.1
-      pos: @opt.pos
-      max: worldWidth * 0.24
-      min: worldWidth * 0.06
-	})
-    
-    world.add @attractor
+    unless @opt.attractor is false
+      @attractor = Physics.behavior('attractor', {
+        order: 2
+        strength: 0.6
+        pos: @opt.pos
+        max: worldWidth * 0.6
+        min: worldWidth * 0.06
+      }) 
+
+      world.add @attractor
     
     @rings = []
     
@@ -88,7 +92,7 @@ class Sun
         pos: pos
         alpha: 0.4
         blendMode: PIXI.BLEND_MODES.SCREEN
-        tint: colors.ltOrange
+        tint: @opt.tint
         scale:
           x: 0.6
           y: 0.6
@@ -100,7 +104,7 @@ class Sun
         pos: pos
         alpha: 0.2
         blendMode: PIXI.BLEND_MODES.SCREEN
-        tint: colors.ltOrange
+        tint: @opt.tint
         tex: stage.tex.bubble
         scale:
           x: 0.7
